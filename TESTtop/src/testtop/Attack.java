@@ -13,7 +13,7 @@ public class Attack
 {
     private boolean isSave;
     private boolean isAttackRoll;
-    private HashMap<String, Integer> dice;
+    private DiceSet[] dice = new DiceSet[10];
     
     private String description;
     private boolean descriptionOn;
@@ -31,7 +31,6 @@ public class Attack
     {
         this.isSave = false;
         this.isAttackRoll = true;
-        this.dice = new HashMap();
         
         this.description = "";
         this.descriptionOn = false;
@@ -51,9 +50,8 @@ public class Attack
      * @param descriptionOn If the description should be displayed on an attack
      * @param saveEffect The affect that occurs on a successful saving throw
      * @param distance The distance the attack can reach
-     * @param dice The dice to be rolled and the type of damage
      */
-    public Attack (boolean isSave, boolean isAttackRoll, String description, boolean descriptionOn, String saveEffect, String saveType, int distance, int longDistance, HashMap<String, Integer> dice)
+    public Attack (boolean isSave, boolean isAttackRoll, String description, boolean descriptionOn, String saveEffect, String saveType, int distance, int longDistance)
     {
         this.isSave = isSave;
         this.isAttackRoll = isAttackRoll;
@@ -66,8 +64,6 @@ public class Attack
         
         this.distance = distance;
         this.longDistance = longDistance;
-        
-        this.dice = dice;
     }
  
 ///////////////////////////////////////GETTERS AND SETTERS//////////////////////////////
@@ -151,12 +147,12 @@ public class Attack
         return (this.longDistance);
     }
     
-    public void setDice (HashMap<String, Integer> dice)
+    public void setDice (DiceSet[] dice)
     {
         this.dice = dice;
     }
     
-    public HashMap<String, Integer> getDice ()
+    public DiceSet[] getDice ()
     {
         return (this.dice);
     }
@@ -165,14 +161,30 @@ public class Attack
     
     public void addDie (String type, int die, int count)
     {
-        for (int i = 0; i < count; i++)
+        int length;
+        for (length = 0; dice[length] != null && length < 10; length++);
+        
+        if (length == 9 && dice[9] != null)
         {
-            dice.put(type, die);
+            System.out.println ("Not enought space!");
+            return;
+            // TODO Add real error print here
         }
+        
+        dice[length] = new DiceSet (type, die, count);
     }
     
-    public void rollAttack ()
+    public HashMap<String, Integer> rollAttack (int toHitModifier, int damageModifier)
     {
-        // TODO: Determine how this should be displayed.
+        HashMap<String, Integer> toHitnDmg = new HashMap();
+        
+        toHitnDmg.put ("ToHit", Roll.rollDie(1, 20) + toHitModifier);
+        
+        for (int i = 0; i < dice.length; i++)
+        {
+            toHitnDmg.put (dice[i].getDamageType(), dice[i].rollDamage(damageModifier));
+        }
+        
+        return (toHitnDmg);
     }
 }

@@ -7,6 +7,6 @@ package testtop;
  * @version 0.1
  * @author Leone Shamoth
  */
-public class Spell {
+public class Item {
     
 }
