@@ -21,8 +21,10 @@ public class Attack
     private String saveEffect;
     private String saveType;
     
-    private int distance;
+    private String distance;
     private int longDistance;
+    private String area;
+    private boolean isAOE;
     
     /**
      * The blank constructor for attacks
@@ -38,8 +40,10 @@ public class Attack
         this.saveEffect = "";
         this.saveType = "STRENGTH";
         
-        this.distance = 5;
+        this.distance = "5";
         this.longDistance = 0;
+        this.area = "";
+        this.isAOE = false;
     }
     
     /**
@@ -51,7 +55,7 @@ public class Attack
      * @param saveEffect The affect that occurs on a successful saving throw
      * @param distance The distance the attack can reach
      */
-    public Attack (boolean isSave, boolean isAttackRoll, String description, boolean descriptionOn, String saveEffect, String saveType, int distance, int longDistance)
+    public Attack (boolean isSave, boolean isAttackRoll, String description, boolean descriptionOn, String saveEffect, String saveType, String distance, int longDistance, String area, boolean isAOE, DiceSet[] dice)
     {
         this.isSave = isSave;
         this.isAttackRoll = isAttackRoll;
@@ -64,6 +68,10 @@ public class Attack
         
         this.distance = distance;
         this.longDistance = longDistance;
+        this.area = area;
+        this.isAOE = isAOE;
+        
+        this.dice = dice;
     }
  
 ///////////////////////////////////////GETTERS AND SETTERS//////////////////////////////
@@ -127,12 +135,12 @@ public class Attack
         return (this.saveType);
     }
     
-    public void setDistance (int distance)
+    public void setDistance (String distance)
     {
         this.distance = distance;
     }
     
-    public int getDistance ()
+    public String getDistance ()
     {
         return (this.distance);
     }
@@ -174,11 +182,9 @@ public class Attack
         dice[length] = new DiceSet (type, die, count);
     }
     
-    public HashMap<String, Integer> rollAttack (int toHitModifier, int damageModifier)
+    public HashMap<String, Integer> rollAttack (int damageModifier)
     {
         HashMap<String, Integer> toHitnDmg = new HashMap();
-        
-        toHitnDmg.put ("ToHit", Roll.rollDie(1, 20) + toHitModifier);
         
         for (int i = 0; i < dice.length; i++)
         {
