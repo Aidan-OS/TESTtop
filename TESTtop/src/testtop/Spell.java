@@ -1,10 +1,12 @@
 package testtop;
 
+import java.util.ArrayList;
+
 /*
  *  TESTtop. Making a better TTS for a happier experience.
  */
 
-import java.util.HashMap;
+
 
 /**
  * @version 0.1
@@ -25,9 +27,9 @@ public class Spell
     private boolean hasAttack;
     private Attack action;
     private int spellLevel;
-    private int multiCast;
+    private boolean scaling;
     
-    private DiceSet higherLevelDamage;
+    private ArrayList<DiceSet> higherLevelDamage;
     
     /**
      * Default constructor for objects of type spell
@@ -50,8 +52,8 @@ public class Spell
         this.hasAttack = false;
         this.action = new Attack ();
         this.spellLevel = 0;
-        this.multiCast = 1;
-        this.higherLevelDamage = new DiceSet ();
+        this.scaling = false;
+        this.higherLevelDamage = new ArrayList<>();
     }
     
     /**
@@ -65,9 +67,9 @@ public class Spell
      * @param atHigherLevels The spell's affect at higher levels
      * @param spellLevel The spell's level
      * @param higherLevelDamage The damage done at higher level casting
-     * @param multiCast The amount of times the spell is to be cast
+     * @param scaling The amount of times the spell is to be cast
      */
-    public Spell (String castingTime, String range, String duration, boolean[] components, String materials, String description, String atHigherLevels, int spellLevel, DiceSet higherLevelDamage, int multiCast)
+    public Spell (String castingTime, String range, String duration, boolean[] components, String materials, String description, String atHigherLevels, int spellLevel, ArrayList<DiceSet> higherLevelDamage, boolean scaling)
     {
         this.castingTime = castingTime;
         this.range = range;
@@ -82,7 +84,7 @@ public class Spell
         this.hasAttack = false;
         this.action = new Attack ();
         this.spellLevel = spellLevel;
-        this.multiCast = multiCast;
+        this.scaling = scaling;
         this.higherLevelDamage = higherLevelDamage;
     }
     
@@ -98,9 +100,9 @@ public class Spell
      * @param action The action that the spell causes
      * @param spellLevel The spell's level
      * @param higherLevelDamage The damage done at higher level casting
-     * @param multiCast The amount of times the spell is to be cast
+     * @param scaling The amount of times the spell is to be cast
      */
-    public Spell (String castingTime, String range, String duration, boolean[] components, String materials, String description, String atHigherLevels, Attack action, int spellLevel, DiceSet higherLevelDamage, int multiCast)
+    public Spell (String castingTime, String range, String duration, boolean[] components, String materials, String description, String atHigherLevels, Attack action, int spellLevel, ArrayList<DiceSet> higherLevelDamage, boolean scaling)
     {
         this.castingTime = castingTime;
         this.range = range;
@@ -117,7 +119,7 @@ public class Spell
         this.spellLevel = spellLevel;
         this.higherLevelDamage = higherLevelDamage;
         
-        this.multiCast = multiCast;
+        this.scaling = scaling;
     }
     
     /////////////////////////////////////Getters and Setters/////////////////////////////
@@ -253,54 +255,112 @@ public class Spell
         return (this.spellLevel);
     }
     
-    public void setMultiCast (int multiCast)
+    public void setscaling (boolean scaling)
     {
-        this.multiCast = multiCast;
+        this.scaling = scaling;
     }
     
-    public int getMultiCast ()
+    public boolean getscaling ()
     {
-        return (this.multiCast);
+        return (this.scaling);
+    }
+    
+    public void setHigherLevelDamage (ArrayList<DiceSet> higherLevelDamage)
+    {
+        this.higherLevelDamage = higherLevelDamage;
+    }
+    
+    public ArrayList<DiceSet> getHigherLevelDamage()
+    {
+        return (this.higherLevelDamage);
+    }
+    
+    public void addHigherDamageDie (DiceSet toAdd)
+    {
+        this.higherLevelDamage.add (toAdd);
     }
        
     //////////////////////////////////Utility Functions///////////////////////////////////
     
-    
-    public HashMap<String, Integer> dealDamage (int level, int damageModifier)
+    /**
+     * Returns the damage amount of the spell
+     * @param level In case of a cantrip, the player level, in case of a spell, the level at which it is cast
+     * @param damageModifier The damage modifier for the attack
+     * @return Am optimized DamageSet of all damage dealt
+     */
+    public ArrayList<DamageSet> dealDamage (int level, int damageModifier)
     {
         if (hasAttack)
         {
-            if (spellLevel == 0 && multiCast == 1) //Regular Cantrip
+            
+            if (spellLevel == 0 && scaling) //Regular Cantrip
             {
+                ArrayList<DamageSet> damage = action.rollAttack(damageModifier);
+                        
                 if (level >= 17)
                 {
-                
+                    for (int i = 0; i < 3; i++)
+                    {
+                        ArrayList<DamageSet> temp = action.rollAttack (damageModifier);
+                        
+                        for (DamageSet toMerge : temp)
+                        {
+                            damage.get(damage.indexOf(toMerge)).merge(toMerge); //Merges the damages
+                        }
+                    }
                 }
             
                 else if (level >= 11)
                 {
-                
+                    for (int i = 0; i < 2; i++)
+                    {
+                        ArrayList<DamageSet> temp = action.rollAttack (damageModifier);
+                        
+                        for (DamageSet toMerge : temp)
+                        {
+                            damage.get(damage.indexOf(toMerge)).merge(toMerge); //Merges the damages
+                        }
+                    }
                 }
             
                 else if (level >= 5)
                 {
-                
+                    ArrayList<DamageSet> temp = action.rollAttack (damageModifier);
+                        
+                    for (DamageSet toMerge : temp)
+                    {
+                        damage.get(damage.indexOf(toMerge)).merge(toMerge); //Merges the damages
+                    }
                 }
-            
-                else
-                {
                 
-                }
+                return (damage);
             }
         
-            else if (spellLevel == 0) //Multicast Cantrip
+            else if (spellLevel == 0) //non scaling Cantrip
             {
+                return (action.rollAttack(damageModifier));
+            }
             
+            else //Normal spellcast
+            {
+                ArrayList<DamageSet> baseDamage = action.rollAttack (damageModifier);
+                
+                if (scaling)
+                {
+                    for (int i = level; i < this.spellLevel; i++)
+                    {
+                        ArrayList<DamageSet> scaledDamageTemp = Attack.rollAttack (0, higherLevelDamage);
+                        
+                        for (DamageSet toMerge : scaledDamageTemp)
+                        {
+                            baseDamage.get(baseDamage.indexOf(toMerge)).merge(toMerge); //Merges the damages
+                        }
+                    }
+                }                
+                return (baseDamage);
             }
         }
         
         return (null);
     }
-    
-    // TODO: Remember that when casting a cantrip, the caster level must be taken into account.
 }

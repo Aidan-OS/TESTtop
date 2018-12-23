@@ -1,4 +1,7 @@
 package testtop;
+
+import java.util.ArrayList;
+
 /*
  *  TESTtop. Making a better TTS for a happier experience.
  */
@@ -7,13 +10,12 @@ package testtop;
  * @version 0.1
  * @author Leone Shamoth
  */
-import java.util.HashMap;
 
 public class Attack
 {
     private boolean isSave;
     private boolean isAttackRoll;
-    private DiceSet[] dice = new DiceSet[10];
+    private ArrayList<DiceSet> dice;
     
     private String description;
     private boolean descriptionOn;
@@ -44,6 +46,7 @@ public class Attack
         this.longDistance = 0;
         this.area = "";
         this.isAOE = false;
+        dice = new ArrayList<>();
     }
     
     /**
@@ -53,9 +56,14 @@ public class Attack
      * @param description The attacks description
      * @param descriptionOn If the description should be displayed on an attack
      * @param saveEffect The affect that occurs on a successful saving throw
+     * @param saveType
      * @param distance The distance the attack can reach
+     * @param longDistance The long distance (for disadvantage)
+     * @param area The Area of effect
+     * @param isAOE If the ability is an area of effect
+     * @param dice The dice for damage, as well as the damage types
      */
-    public Attack (boolean isSave, boolean isAttackRoll, String description, boolean descriptionOn, String saveEffect, String saveType, String distance, int longDistance, String area, boolean isAOE, DiceSet[] dice)
+    public Attack (boolean isSave, boolean isAttackRoll, String description, boolean descriptionOn, String saveEffect, String saveType, String distance, int longDistance, String area, boolean isAOE, ArrayList<DiceSet>dice)
     {
         this.isSave = isSave;
         this.isAttackRoll = isAttackRoll;
@@ -95,7 +103,7 @@ public class Attack
         return (this.isAttackRoll);
     }
     
-    public void setDescription (String descripton)
+    public void setDescription (String description)
     {
         this.description = description;
     }
@@ -155,12 +163,12 @@ public class Attack
         return (this.longDistance);
     }
     
-    public void setDice (DiceSet[] dice)
+    public void setDice (ArrayList<DiceSet> dice)
     {
         this.dice = dice;
     }
     
-    public DiceSet[] getDice ()
+    public ArrayList<DiceSet> getDice ()
     {
         return (this.dice);
     }
@@ -168,29 +176,61 @@ public class Attack
     /////////////////////////////////////////////////////////Utility Functions///////////////////////////////////////////////
     
     public void addDie (String type, int die, int count)
-    {
-        int length;
-        for (length = 0; dice[length] != null && length < 10; length++);
-        
-        if (length == 9 && dice[9] != null)
-        {
-            System.out.println ("Not enought space!");
-            return;
-            // TODO Add real error print here
-        }
-        
-        dice[length] = new DiceSet (type, die, count);
+    {   
+        dice.add(new DiceSet (type, die, count));
     }
     
-    public HashMap<String, Integer> rollAttack (int damageModifier)
+    public ArrayList<DamageSet> rollAttack (int damageModifier)
     {
-        HashMap<String, Integer> toHitnDmg = new HashMap();
+        ArrayList<DamageSet> damage = new ArrayList<>();
         
-        for (int i = 0; i < dice.length; i++)
+        for (DiceSet current : dice)
         {
-            toHitnDmg.put (dice[i].getDamageType(), dice[i].rollDamage(damageModifier));
+            DamageSet toAdd = new DamageSet(current.getDamageType(), current.rollDamage(damageModifier));
+            
+            boolean didMerge = false;
+            
+            for (DamageSet merging : damage)
+            {
+                if (merging.merge(toAdd))
+                {
+                    didMerge = true;
+                }
+            }
+            
+            if (!didMerge)
+            {
+                damage.add (toAdd);
+            }
         }
         
-        return (toHitnDmg);
+        return (damage);
+    }
+    
+    public static ArrayList<DamageSet> rollAttack (int damageModifier, ArrayList<DiceSet> dice)
+    {
+        ArrayList<DamageSet> damage = new ArrayList<>();
+        
+        for (DiceSet current : dice)
+        {
+            DamageSet toAdd = new DamageSet(current.getDamageType(), current.rollDamage(damageModifier));
+            
+            boolean didMerge = false;
+            
+            for (DamageSet merging : damage)
+            {
+                if (merging.merge(toAdd))
+                {
+                    didMerge = true;
+                }
+            }
+            
+            if (!didMerge)
+            {
+                damage.add (toAdd);
+            }
+        }
+        
+        return (damage);
     }
 }
