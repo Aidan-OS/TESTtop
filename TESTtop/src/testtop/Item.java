@@ -17,6 +17,9 @@ public class Item
     private boolean isMagic;
     
     private ArrayList<Attack> action;
+    private boolean isVersatile;
+    private Attack versatile;
+    
     private int attackBonus;
     private int toHitBonus;
     
@@ -32,6 +35,9 @@ public class Item
         this.isMagic = false;
         
         this.action = new ArrayList<>();
+        this.isVersatile = false;
+        this.versatile = null;
+        
         this.attackBonus = 0;
         this.toHitBonus = 0;
         
@@ -48,6 +54,9 @@ public class Item
         this.isMagic = isMagic;
         
         this.action = new ArrayList<>();
+        this.isVersatile = false;
+        this.versatile = null;
+        
         this.attackBonus = attackBonus;
         this.toHitBonus = toHitBonus;
         
@@ -64,6 +73,9 @@ public class Item
         this.isMagic = isMagic;
         
         this.action = action;
+        this.isVersatile = false;
+        this.versatile = null;
+        
         this.attackBonus = attackBonus;
         this.toHitBonus = toHitBonus;
         
@@ -171,10 +183,34 @@ public class Item
         action.add (toAdd);
     }
     
-    /////////////////////////////////////////////Utility Functions////////////////////////
+    public void addVersatility (Attack versatile)
+    {
+        this.isVersatile = true;
+        this.versatile = versatile;
+    }
+    
+    public boolean getVersatility ()
+    {
+        return (this.isVersatile);
+    }
+    
+    public void removeVersatility ()
+    {
+        this.isVersatile = false;
+        this.versatile = null;
+    }
+    
+    /////////////////////////////////////////////Utility Functions/////////////////////////////////
     
     public ArrayList<DamageSet> rollDamage (int damageModifier)
     {
-        // TODO Fill this in
+        ArrayList<DamageSet> returnDamage = new ArrayList<>();
+        
+        for (Attack current : action)
+        {
+            returnDamage.addAll(current.rollAttack(damageModifier));
+        }
+        
+        return (returnDamage);
     }
 }

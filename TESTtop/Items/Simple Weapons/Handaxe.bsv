@@ -1,0 +1,1 @@
+Handaxe|false|0|0|A generic Handaxe.|Light, Thrown (Range 20/60)|2|5|1d6*Slashing|

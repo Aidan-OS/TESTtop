@@ -1,0 +1,1 @@
+Mace|false|0|0|A generic mace.||4|5|1d6*Bludgeoning|

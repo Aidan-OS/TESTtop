@@ -1,0 +1,1 @@
+Sickle|false|0|0|A generic sickle.|Light|2|1|1dd*Slashing|

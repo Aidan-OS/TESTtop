@@ -1,0 +1,1 @@
+Light Hammer|false|0|0|A generic light hammer.|Light, Thrown (range 20/60)|2|2|1d4*Bludgeoning|

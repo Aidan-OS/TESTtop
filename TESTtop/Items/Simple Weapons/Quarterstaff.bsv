@@ -1,0 +1,1 @@
+Quarterstaff|false|0|0|A generic quarterstaff.|Versatile (1d8)|4|0.2|1d6*Bludgeoning|1d8*Bludgeoning

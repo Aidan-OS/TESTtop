@@ -1,0 +1,1 @@
+Spear|false|0|0|A generic spear.|Thrown (range 20-60), Versatile (1d8)|3|1|1d6*Piercing|1d8*Piercing

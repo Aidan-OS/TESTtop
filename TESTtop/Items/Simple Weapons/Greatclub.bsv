@@ -1,0 +1,1 @@
+Greatclub|false|0|0|A generic greatclub.|Two-Handed|10|0.2|1d8*Bludgeoning|
